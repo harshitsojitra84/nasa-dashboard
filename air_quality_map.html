@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_71153475e2c5e800fd398a8ede5370d7 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+<div style="
+position: fixed; bottom: 30px; left: 30px; width: 230px;
+background-color: rgba(255,255,255,0.9);
+border-radius: 10px; padding: 12px; font-size:14px;
+box-shadow: 2px 2px 5px grey; z-index:9999;">
+<b>🌫 AQI Scale</b><br>
+<span style="color:green;">●</span> Good (0–50)<br>
+<span style="color:yellow;">●</span> Moderate (51–100)<br>
+<span style="color:orange;">●</span> Unhealthy for Sensitive (101–150)<br>
+<span style="color:red;">●</span> Unhealthy (151–200)<br>
+<span style="color:purple;">●</span> Very Unhealthy (201+)<br>
+</div>
+    
+<div style="
+position: fixed; top: 60px; right: 30px; width: 260px;
+background-color: rgba(255,255,255,0.95);
+border-radius: 10px; padding: 12px; font-size:14px;
+box-shadow: 2px 2px 5px grey; z-index:9999;">
+<b>ℹ️ Air Quality Map</b><br>
+Shows simulated AQI by region (100–200 km zones).<br>
+Colors = Air Quality Levels:<br>
+🟢 Good → 🟡 Moderate → 🟠 Unhealthy (Sensitive)<br>
+🔴 Unhealthy → 🟣 Very Unhealthy<br>
+Click circles for PM2.5 & PM10 data.
+</div>
+    
+<div style="
+position: fixed; top: 0; left: 0; width: 100%; height: 40px;
+background-color: #222; color: white; z-index:9999;
+font-size:16px; padding: 8px; text-align:center;">
+<a href='fire_map.html' style="color:white; margin-right:25px; text-decoration:none;">🔥 Wildfire</a>
+<a href='algal_bloom.html' style="color:white; margin-right:25px; text-decoration:none;">🌊 Algal Bloom</a>
+<a href='weather_map.html' style="color:white; margin-right:25px; text-decoration:none;">🌦 Weather</a>
+<a href='air_quality_map.html' style="color:yellow; text-decoration:none;">🌫 Air Quality</a>
+</div>
+    
+            <div class="folium-map" id="map_71153475e2c5e800fd398a8ede5370d7" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_71153475e2c5e800fd398a8ede5370d7 = L.map(
+                "map_71153475e2c5e800fd398a8ede5370d7",
+                {
+                    center: [20.0, 0.0],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 2,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_dbdaf15325ff84abc6f18b70231dea99 = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_dbdaf15325ff84abc6f18b70231dea99.addTo(map_71153475e2c5e800fd398a8ede5370d7);
+        
+    
+            var circle_a318afbc32e63bc132e06b650610856b = L.circle(
+                [40.71, -74.0],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.5, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 120000, "stroke": true, "weight": 3}
+            ).addTo(map_71153475e2c5e800fd398a8ede5370d7);
+        
+    
+        var popup_da2f7374ae1cdcf52b28f9a6e4921d61 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_94f280b73caf78d2ab7a6054d2e0d7ce = $(`<div id="html_94f280b73caf78d2ab7a6054d2e0d7ce" style="width: 100.0%; height: 100.0%;"><b>🌫 New York Area</b><br>AQI: 122 (Unhealthy (Sensitive))<br>🟤 PM2.5: 56.7 µg/m³<br>⚪ PM10: 21.3 µg/m³</div>`)[0];
+                popup_da2f7374ae1cdcf52b28f9a6e4921d61.setContent(html_94f280b73caf78d2ab7a6054d2e0d7ce);
+            
+        
+
+        circle_a318afbc32e63bc132e06b650610856b.bindPopup(popup_da2f7374ae1cdcf52b28f9a6e4921d61)
+        ;
+
+        
+    
+    
+            var circle_1f84b9e03b2ddd340e1f7f9bd102cd9a = L.circle(
+                [34.05, -118.24],
+                {"bubblingMouseEvents": true, "color": "purple", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "purple", "fillOpacity": 0.5, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 120000, "stroke": true, "weight": 3}
+            ).addTo(map_71153475e2c5e800fd398a8ede5370d7);
+        
+    
+        var popup_2635c25f241183013980548c90768cd4 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_d9bd96ab08fbef42de067aebb7eed305 = $(`<div id="html_d9bd96ab08fbef42de067aebb7eed305" style="width: 100.0%; height: 100.0%;"><b>🌫 Los Angeles Area</b><br>AQI: 290 (Very Unhealthy)<br>🟤 PM2.5: 30.0 µg/m³<br>⚪ PM10: 24.2 µg/m³</div>`)[0];
+                popup_2635c25f241183013980548c90768cd4.setContent(html_d9bd96ab08fbef42de067aebb7eed305);
+            
+        
+
+        circle_1f84b9e03b2ddd340e1f7f9bd102cd9a.bindPopup(popup_2635c25f241183013980548c90768cd4)
+        ;
+
+        
+    
+    
+            var circle_87a251d89f5f6d59397af5b2ce0e49b2 = L.circle(
+                [51.5, -0.12],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.5, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 120000, "stroke": true, "weight": 3}
+            ).addTo(map_71153475e2c5e800fd398a8ede5370d7);
+        
+    
+        var popup_9ee1e17d10bb0c26bf5e20569cdb74bc = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_4ddc930a4c7f60712789b41e21367c45 = $(`<div id="html_4ddc930a4c7f60712789b41e21367c45" style="width: 100.0%; height: 100.0%;"><b>🌫 London Region</b><br>AQI: 126 (Unhealthy (Sensitive))<br>🟤 PM2.5: 101.1 µg/m³<br>⚪ PM10: 114.5 µg/m³</div>`)[0];
+                popup_9ee1e17d10bb0c26bf5e20569cdb74bc.setContent(html_4ddc930a4c7f60712789b41e21367c45);
+            
+        
+
+        circle_87a251d89f5f6d59397af5b2ce0e49b2.bindPopup(popup_9ee1e17d10bb0c26bf5e20569cdb74bc)
+        ;
+
+        
+    
+    
+            var circle_0c2ac1a8e25ad4acc8aae0f073f1090c = L.circle(
+                [28.61, 77.21],
+                {"bubblingMouseEvents": true, "color": "yellow", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "yellow", "fillOpacity": 0.5, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 120000, "stroke": true, "weight": 3}
+            ).addTo(map_71153475e2c5e800fd398a8ede5370d7);
+        
+    
+        var popup_702f080edb5d50e0afdde24e029e55b4 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_87d923b35f843dc4a6afcb51d7bd95ac = $(`<div id="html_87d923b35f843dc4a6afcb51d7bd95ac" style="width: 100.0%; height: 100.0%;"><b>🌫 Delhi NCR</b><br>AQI: 91 (Moderate)<br>🟤 PM2.5: 17.9 µg/m³<br>⚪ PM10: 92.0 µg/m³</div>`)[0];
+                popup_702f080edb5d50e0afdde24e029e55b4.setContent(html_87d923b35f843dc4a6afcb51d7bd95ac);
+            
+        
+
+        circle_0c2ac1a8e25ad4acc8aae0f073f1090c.bindPopup(popup_702f080edb5d50e0afdde24e029e55b4)
+        ;
+
+        
+    
+    
+            var circle_50fcec1a384a1fbd620ac42e350af431 = L.circle(
+                [39.9, 116.4],
+                {"bubblingMouseEvents": true, "color": "purple", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "purple", "fillOpacity": 0.5, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 120000, "stroke": true, "weight": 3}
+            ).addTo(map_71153475e2c5e800fd398a8ede5370d7);
+        
+    
+        var popup_5c74fbfb52a038c552b0f48d6f358154 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_3e7a9c69cec787d6be779e9c0fb3d275 = $(`<div id="html_3e7a9c69cec787d6be779e9c0fb3d275" style="width: 100.0%; height: 100.0%;"><b>🌫 Beijing Region</b><br>AQI: 208 (Very Unhealthy)<br>🟤 PM2.5: 111.1 µg/m³<br>⚪ PM10: 28.4 µg/m³</div>`)[0];
+                popup_5c74fbfb52a038c552b0f48d6f358154.setContent(html_3e7a9c69cec787d6be779e9c0fb3d275);
+            
+        
+
+        circle_50fcec1a384a1fbd620ac42e350af431.bindPopup(popup_5c74fbfb52a038c552b0f48d6f358154)
+        ;
+
+        
+    
+    
+            var circle_67188b4b48c392f3087499e907036a31 = L.circle(
+                [-33.87, 151.21],
+                {"bubblingMouseEvents": true, "color": "green", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "green", "fillOpacity": 0.5, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 120000, "stroke": true, "weight": 3}
+            ).addTo(map_71153475e2c5e800fd398a8ede5370d7);
+        
+    
+        var popup_a9ab051e6b39f91dbeb4b76cb82c1bd5 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_cb76b21614cb870b94d3e8393e80393c = $(`<div id="html_cb76b21614cb870b94d3e8393e80393c" style="width: 100.0%; height: 100.0%;"><b>🌫 Sydney Metro</b><br>AQI: 40 (Good)<br>🟤 PM2.5: 141.4 µg/m³<br>⚪ PM10: 195.3 µg/m³</div>`)[0];
+                popup_a9ab051e6b39f91dbeb4b76cb82c1bd5.setContent(html_cb76b21614cb870b94d3e8393e80393c);
+            
+        
+
+        circle_67188b4b48c392f3087499e907036a31.bindPopup(popup_a9ab051e6b39f91dbeb4b76cb82c1bd5)
+        ;
+
+        
+    
+    
+            var circle_d66f263e85efdabb0b8600bb41cfa5d4 = L.circle(
+                [30.04, 31.23],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.5, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 120000, "stroke": true, "weight": 3}
+            ).addTo(map_71153475e2c5e800fd398a8ede5370d7);
+        
+    
+        var popup_6acd7f7e86a1a425ec3e93dc3fe1603b = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_e662a170cebd70a51b1bcbfc1e7224f2 = $(`<div id="html_e662a170cebd70a51b1bcbfc1e7224f2" style="width: 100.0%; height: 100.0%;"><b>🌫 Cairo Region</b><br>AQI: 122 (Unhealthy (Sensitive))<br>🟤 PM2.5: 10.1 µg/m³<br>⚪ PM10: 61.9 µg/m³</div>`)[0];
+                popup_6acd7f7e86a1a425ec3e93dc3fe1603b.setContent(html_e662a170cebd70a51b1bcbfc1e7224f2);
+            
+        
+
+        circle_d66f263e85efdabb0b8600bb41cfa5d4.bindPopup(popup_6acd7f7e86a1a425ec3e93dc3fe1603b)
+        ;
+
+        
+    
+    
+            var circle_be44f52ea92c939c02d2bb6615969f01 = L.circle(
+                [-23.55, -46.63],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.5, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 120000, "stroke": true, "weight": 3}
+            ).addTo(map_71153475e2c5e800fd398a8ede5370d7);
+        
+    
+        var popup_4dd1fc5bd246fae83631ef5a1b87a24b = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_80234e53a3ef99a725d9c1ef8405a814 = $(`<div id="html_80234e53a3ef99a725d9c1ef8405a814" style="width: 100.0%; height: 100.0%;"><b>🌫 São Paulo Metro</b><br>AQI: 141 (Unhealthy (Sensitive))<br>🟤 PM2.5: 148.9 µg/m³<br>⚪ PM10: 36.3 µg/m³</div>`)[0];
+                popup_4dd1fc5bd246fae83631ef5a1b87a24b.setContent(html_80234e53a3ef99a725d9c1ef8405a814);
+            
+        
+
+        circle_be44f52ea92c939c02d2bb6615969f01.bindPopup(popup_4dd1fc5bd246fae83631ef5a1b87a24b)
+        ;
+
+        
+    
+    
+            var circle_2b7ff743ba95b767ab01b0f3bd1fc30e = L.circle(
+                [48.85, 2.35],
+                {"bubblingMouseEvents": true, "color": "purple", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "purple", "fillOpacity": 0.5, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 120000, "stroke": true, "weight": 3}
+            ).addTo(map_71153475e2c5e800fd398a8ede5370d7);
+        
+    
+        var popup_5795f3e2087ad0b89ffc75fb0b7ebe34 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_ae521c77f5596a4a632e3d7d5c025214 = $(`<div id="html_ae521c77f5596a4a632e3d7d5c025214" style="width: 100.0%; height: 100.0%;"><b>🌫 Paris Region</b><br>AQI: 234 (Very Unhealthy)<br>🟤 PM2.5: 96.4 µg/m³<br>⚪ PM10: 131.3 µg/m³</div>`)[0];
+                popup_5795f3e2087ad0b89ffc75fb0b7ebe34.setContent(html_ae521c77f5596a4a632e3d7d5c025214);
+            
+        
+
+        circle_2b7ff743ba95b767ab01b0f3bd1fc30e.bindPopup(popup_5795f3e2087ad0b89ffc75fb0b7ebe34)
+        ;
+
+        
+    
+    
+            var circle_a8ced4346fda51a6887a2b5da65abfd2 = L.circle(
+                [35.68, 139.69],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.5, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 120000, "stroke": true, "weight": 3}
+            ).addTo(map_71153475e2c5e800fd398a8ede5370d7);
+        
+    
+        var popup_04e67d4324ed22fd6426175f69c16ff4 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_9c14ef97d982e2e2d6bea2c9e90753a3 = $(`<div id="html_9c14ef97d982e2e2d6bea2c9e90753a3" style="width: 100.0%; height: 100.0%;"><b>🌫 Tokyo Region</b><br>AQI: 107 (Unhealthy (Sensitive))<br>🟤 PM2.5: 95.6 µg/m³<br>⚪ PM10: 88.8 µg/m³</div>`)[0];
+                popup_04e67d4324ed22fd6426175f69c16ff4.setContent(html_9c14ef97d982e2e2d6bea2c9e90753a3);
+            
+        
+
+        circle_a8ced4346fda51a6887a2b5da65abfd2.bindPopup(popup_04e67d4324ed22fd6426175f69c16ff4)
+        ;
+
+        
+    
+</script>
+</html>
